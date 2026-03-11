@@ -13,4 +13,5 @@ class BoothItem:
     image_url: str | None
     is_end_of_sale: bool | None
     is_sold_out: bool | None
+    sale_end_at: str | None = None
     artist: str | None = None

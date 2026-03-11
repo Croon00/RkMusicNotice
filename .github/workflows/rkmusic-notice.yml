@@ -1,0 +1,55 @@
+name: RK Music Notice
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: rkmusic-notice
+  cancel-in-progress: false
+
+jobs:
+  run-notifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore state cache
+        id: state-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: state_seen_urls.json
+          key: state-${{ github.repository }}-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            state-${{ github.repository }}-${{ github.ref_name }}-
+
+      - name: Run notifier
+        env:
+          DEFAULT_DISCORD_WEBHOOK_URL: ${{ secrets.DEFAULT_DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URLS: ${{ secrets.DISCORD_WEBHOOK_URLS }}
+          SKIP_ALERT_ON_FIRST_RUN: "false"
+          STATE_FILE: state_seen_urls.json
+        run: python app.py
+
+      - name: Save state cache
+        if: always() && hashFiles('state_seen_urls.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: state_seen_urls.json
+          key: state-${{ github.repository }}-${{ github.ref_name }}-${{ github.run_id }}
