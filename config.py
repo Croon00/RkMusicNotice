@@ -39,7 +39,16 @@ DEFAULT_DISCORD_WEBHOOK_URL = os.getenv("DEFAULT_DISCORD_WEBHOOK_URL", "")
 
 # Optional JSON map. Example:
 # {"HACHI":"https://discord.com/api/webhooks/...","KMNZ":"https://discord.com/api/webhooks/..."}
-DISCORD_WEBHOOK_URLS = json.loads(os.getenv("DISCORD_WEBHOOK_URLS", "{}"))
+_raw_webhook_map = (os.getenv("DISCORD_WEBHOOK_URLS", "") or "").strip()
+if not _raw_webhook_map:
+    DISCORD_WEBHOOK_URLS = {}
+else:
+    try:
+        _parsed = json.loads(_raw_webhook_map)
+        DISCORD_WEBHOOK_URLS = _parsed if isinstance(_parsed, dict) else {}
+    except json.JSONDecodeError:
+        print("[WARN] DISCORD_WEBHOOK_URLS is not valid JSON. fallback to {}")
+        DISCORD_WEBHOOK_URLS = {}
 
 STATE_FILE = os.getenv("STATE_FILE", "state_seen_urls.json")
 # If True and state file is empty/non-existent, first run only saves state without alert.
