@@ -30,23 +30,23 @@ def _alert_title_prefix(alert_type: str) -> str:
 
 def _alert_description(alert_type: str) -> str:
     if alert_type == ALERT_NEW:
-        return "A new item has been listed."
+        return "새 상품이 등록되었습니다."
     if alert_type == ALERT_REMINDER_24H:
-        return "This item will end within 24 hours."
+        return "이 상품은 24시간 이내에 종료됩니다."
     if alert_type == ALERT_SOLD_OUT:
-        return "This item is sold out now."
+        return "이 상품은 현재 품절 상태입니다."
     if alert_type == ALERT_ENDED:
-        return "This item sale has ended."
+        return "이 상품의 판매가 종료되었습니다."
     return "Item notification."
 
 
 def _build_message(item: BoothItem, alert_type: str) -> dict:
     status = []
     if item.is_end_of_sale:
-        status.append("End of sale")
+        status.append("판매 종료")
     if item.is_sold_out:
-        status.append("Sold out")
-    status_text = ", ".join(status) if status else "On sale"
+        status.append("품절")
+    status_text = ", ".join(status) if status else "판매 중"
 
     sale_end = item.sale_end_at or "-"
     embed = {
@@ -56,10 +56,10 @@ def _build_message(item: BoothItem, alert_type: str) -> dict:
         "color": _artist_color(item.artist),
         "description": (
             f"{_alert_description(alert_type)}\n\n"
-            f"Price: {item.price or '-'}\n"
+            f"가격: {item.price or '-'}\n"
             f"Item ID: {item.item_id or '-'}\n"
-            f"Status: {status_text}\n"
-            f"Sale End: {sale_end}"
+            f"상태: {status_text}\n"
+            f"판매 종료 기간: {sale_end}"
         ),
         "footer": {"text": "RkMusicNotice"},
     }
