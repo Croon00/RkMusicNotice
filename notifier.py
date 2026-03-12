@@ -73,8 +73,8 @@ def _build_message(item: BoothItem, alert_type: str) -> dict:
 def send_discord_webhook(
     webhook_url: str,
     payload: dict,
-    timeout: int = 10,
-    max_retries_on_429: int = 5,
+    timeout: int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         = 10,
+    max_retries_on_429: int = 5,                                                        
 ) -> bool:
     for attempt in range(max_retries_on_429 + 1):
         resp = requests.post(webhook_url, json=payload, timeout=timeout)
